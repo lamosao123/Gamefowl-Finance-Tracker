@@ -1,0 +1,731 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#111827">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Gamefowl Finance">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="apple-touch-icon" href="./icon-192.png">
+<title>Gamefowl Finance Tracker</title>
+<style>
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#f3f4f6;color:#111827;-webkit-text-size-adjust:100%}
+header{position:sticky;top:0;z-index:20;background:#111827;color:#fff;padding:13px max(12px,env(safe-area-inset-left)) 10px;box-shadow:0 2px 12px #0003}header h1{font-size:20px;line-height:1.2;margin:0 0 3px}.sub{font-size:12px;opacity:.78}
+nav{display:flex;gap:7px;overflow-x:auto;padding:10px 0 1px;scrollbar-width:none}nav::-webkit-scrollbar{display:none}nav button{border:0;border-radius:999px;padding:9px 13px;background:#374151;color:#fff;white-space:nowrap;min-height:40px;font-weight:650}nav button.active{background:#fff;color:#111827}
+main{max-width:1150px;margin:auto;padding:14px}.tab{display:none}.tab.active{display:block}section{margin-bottom:16px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(165px,1fr));gap:10px}.card{background:#fff;border-radius:15px;padding:14px;box-shadow:0 1px 5px #0001}.stat{min-height:100px}.label{font-size:12px;color:#6b7280}.value{font-size:22px;font-weight:800;margin-top:4px;line-height:1.2}h2{font-size:19px;margin:7px 0 12px}h3{font-size:15px;margin:3px 0 9px}.muted{color:#6b7280;font-size:12px;line-height:1.45}.small{font-size:11px}
+.row{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:10px}label{display:block;font-size:12px;color:#374151;font-weight:650}input,select,textarea,button{font:inherit}input,select,textarea{width:100%;padding:11px;border:1px solid #cbd5e1;border-radius:10px;background:#fff;color:#111827;margin-top:5px;font-size:16px}textarea{min-height:80px;resize:vertical}input::placeholder,textarea::placeholder{color:#6b7280}input:disabled,select:disabled,textarea:disabled,input[readonly]{color:#111827;opacity:1}
+.btn{border:0;border-radius:10px;padding:11px 14px;background:#111827;color:#fff;font-weight:700;min-height:44px}.btn.secondary{background:#e5e7eb;color:#111827}.btn.success{background:#166534}.btn.danger{background:#b91c1c}.btn.warn{background:#92400e}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}.actions .btn{flex:1 1 140px}.notice,.sync-ok,.sync-warn,.sync-bad{padding:11px;border-radius:11px;font-size:13px;line-height:1.45}.notice{background:#eff6ff;border:1px solid #bfdbfe}.sync-ok{background:#ecfdf5;border:1px solid #a7f3d0;color:#065f46}.sync-warn{background:#fffbeb;border:1px solid #fde68a;color:#92400e}.sync-bad{background:#fef2f2;border:1px solid #fecaca;color:#991b1b}
+.trio{border-left:5px solid #111827}.trio-head{display:flex;justify-content:space-between;gap:10px;align-items:center}.pill{display:inline-block;background:#eef2ff;border-radius:999px;padding:5px 9px;font-size:11px;margin:2px}.good{color:#166534;font-weight:750}.warntext{color:#92400e;font-weight:750}.bad{color:#b91c1c;font-weight:750}.progress{height:9px;background:#e5e7eb;border-radius:999px;overflow:hidden;margin-top:7px}.progress>span{display:block;height:100%;background:#111827;border-radius:999px}
+.list{display:grid;gap:10px}.item{background:#fff;border-radius:14px;padding:12px;box-shadow:0 1px 5px #0001}.item-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}.item-title{font-weight:800;margin-bottom:7px}.item-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}.item-actions .btn{width:100%}.wide{overflow:auto}.table{width:100%;border-collapse:collapse;font-size:13px;background:#fff;border-radius:12px;overflow:hidden}.table th,.table td{padding:9px;border-bottom:1px solid #e5e7eb;text-align:left;white-space:nowrap}.table th{background:#f8fafc}.desktop-only{display:block}.mobile-only{display:none}
+.empty{padding:18px;text-align:center;color:#6b7280;background:#fff;border-radius:14px}.footer{padding:15px 0 35px;text-align:center;color:#6b7280;font-size:11px}
+@media(max-width:600px){header{padding-top:calc(10px + env(safe-area-inset-top));padding-left:10px;padding-right:10px}.sub{font-size:11px}main{padding:10px}.grid{grid-template-columns:1fr 1fr}.stat{min-height:92px}.value{font-size:19px}.row{grid-template-columns:1fr 1fr}.row .full{grid-column:1/-1}.desktop-only{display:none}.mobile-only{display:block}.item-grid{grid-template-columns:1fr 1fr}.actions .btn{flex:1 1 100%}.hero{padding:16px}.hero .value{font-size:27px}}
+@media(max-width:390px){.grid,.row,.item-grid{grid-template-columns:1fr}.grid .stat:nth-child(n){min-height:auto}nav button{padding-left:11px;padding-right:11px}}
+
+.production-summary{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin:12px 0}
+.production-summary>div{border:1px solid #ddd;border-radius:10px;padding:9px;text-align:center;background:#fafafa}
+.production-summary span{display:block;font-size:12px;color:#555}
+.production-summary b{display:block;font-size:18px;margin-top:3px}
+.production-details{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;font-size:13px}
+.record-head{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.record-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+@media(max-width:600px){
+  .production-summary{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .production-details{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .record-head{align-items:flex-start}
+  .record-actions button{min-height:44px}
+}
+
+
+.auth-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;padding:20px;z-index:9999}
+.auth-box{width:min(420px,100%);background:#fff;border-radius:18px;padding:22px;box-shadow:0 20px 60px rgba(0,0,0,.25)}
+.auth-box h2{margin:0 0 6px}
+.auth-box p{margin:6px 0 16px;color:#555}
+.auth-box input{width:100%;box-sizing:border-box;margin:7px 0;padding:13px;border:1px solid #bbb;border-radius:10px;font-size:16px;color:#000;background:#fff}
+.auth-box button{width:100%;margin-top:8px;min-height:44px}
+.auth-error{color:#b00020;font-size:14px;min-height:20px;margin-top:8px}
+.user-bar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:8px 0}
+.role-badge{display:inline-block;border-radius:999px;padding:4px 9px;font-size:12px;font-weight:700;background:#eee}
+.cloud-badge{font-size:13px;font-weight:600}
+.admin-only{display:none}
+.auth-small{font-size:12px;color:#666;margin-top:10px}
+
+
+.production-stats{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:7px;margin:10px 0}
+.production-stats>div{background:#f6f7f9;border:1px solid #ddd;border-radius:10px;padding:8px;text-align:center}
+.production-stats span{display:block;font-size:11px;color:#555}.production-stats b{font-size:18px}
+.production-details{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:7px;font-size:13px}
+@media(max-width:600px){.production-stats{grid-template-columns:repeat(2,minmax(0,1fr))}.production-details{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+.chart-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:14px}
+.chart-card{background:#fff;border:1px solid #ddd;border-radius:14px;padding:12px;box-shadow:0 2px 8px rgba(0,0,0,.04)}
+.chart-card h3{margin:2px 0 8px;font-size:15px}
+.chart-wrap{position:relative;height:250px;width:100%}
+.chart-wrap canvas{width:100%;height:100%;display:block}
+.chart-legend{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;font-size:12px}
+.legend-item{display:flex;align-items:center;gap:5px}.legend-dot{width:10px;height:10px;border-radius:50%;display:inline-block}
+@media(max-width:600px){.chart-grid{grid-template-columns:1fr}.chart-wrap{height:250px}}
+.data-table{width:100%;border-collapse:collapse}.data-table th,.data-table td{padding:9px;border-bottom:1px solid #e5e7eb;text-align:left}.data-table th{font-weight:700}@media(max-width:600px){.data-table{font-size:13px}} </style>
+
+</head>
+<body>
+
+<div id="authOverlay" class="auth-overlay">
+  <div class="auth-box">
+    <h2>Gamefowl Finance Tracker</h2>
+    <p>Sign in to access your tracker.</p>
+    <form id="loginForm" novalidate onsubmit="return false;">
+      <input id="loginEmail" type="text" placeholder="Username" autocomplete="username" autocapitalize="none" spellcheck="false">
+      <input id="loginPassword" type="password" placeholder="Password" autocomplete="current-password">
+      <button type="button" data-public-field="true" onclick="localLogin(document.getElementById('loginEmail').value.trim(),document.getElementById('loginPassword').value);">Sign In</button>
+    </form>
+    <div id="authError" class="auth-error"></div>
+    <div class="auth-small">Admin and user access are enabled for this app.</div>
+  </div>
+</div>
+
+<header>
+<div id="userBar" class="user-bar">
+  <div>
+    <span id="userEmail"></span>
+    <span id="userRole" class="role-badge"></span>
+    <span id="cloudStatus" class="cloud-badge"></span>
+  </div>
+  <button type="button" class="btn secondary" onclick="localSignOut()">Sign Out</button>
+</div>
+
+  <h1>🐓 Gamefowl Finance Tracker</h1>
+  <div class="sub">Mobile-first • works on iPhone & Android • offline-ready • automatic local saving</div>
+  <nav id="nav"></nav>
+</header>
+<section id="adminPanel" class="card admin-only" style="margin:10px auto;max-width:1150px">
+  <h2>Admin Access</h2>
+  <p class="muted">You are signed in with administrator access. This tracker stores data locally on this device/browser.</p>
+</section>
+<main>
+  <div id="dashboard" class="tab active"></div>
+  <div id="trios" class="tab"></div>
+  <div id="production" class="tab"></div>
+  <div id="sales" class="tab"></div>
+  <div id="capital" class="tab"></div>
+  <div id="partners" class="tab"></div>
+  <div id="data" class="tab"></div>
+  <div class="footer">Gamefowl Finance Tracker • automatic local saving • export backups regularly</div>
+</main>
+<script>
+const SUPABASE_URL="";
+const SUPABASE_PUBLISHABLE_KEY="";
+const cloudConfigured=false;
+const sb=null;
+const KEY="gamefowl_finance_v3";
+const today=()=>new Date().toISOString().slice(0,10);
+const uid=()=>crypto.randomUUID?crypto.randomUUID():"id-"+Date.now()+"-"+Math.random().toString(16).slice(2);
+const defaultState={
+ settings:{salePrice:1000,partners:[{id:"p1",name:"Charson",share:500},{id:"p2",name:"Mark",share:250},{id:"p3",name:"Rik2",share:250}]},
+ trios:[{id:"t1",name:"Golden Boy",capital:86000,housing:17000,notes:""},{id:"t2",name:"White Kelso",capital:86000,housing:17000,notes:""}],
+ capitalItems:[],production:[],sales:[]
+};
+function clone(x){return typeof structuredClone==="function"?structuredClone(x):JSON.parse(JSON.stringify(x))}
+function normalize(raw){
+  let x=raw&&typeof raw==="object"?clone(raw):clone(defaultState);
+  x.settings=x.settings||{}; x.settings.salePrice=Number(x.settings.salePrice)||1000;
+  x.settings.partners=[{id:"p1",name:"Charson",share:500},{id:"p2",name:"Mark",share:250},{id:"p3",name:"Rik2",share:250}];
+  x.trios=Array.isArray(x.trios)&&x.trios.length?x.trios:clone(defaultState.trios);
+  const names=["Golden Boy","White Kelso"];
+  x.trios=x.trios.slice(0,2).map((t,i)=>({id:t.id||"t"+(i+1),name:names[i]||t.name||("Trio "+(i+1)),capital:Number(t.capital)||0,housing:Number(t.housing)||0,notes:t.notes||""}));
+  while(x.trios.length<2)x.trios.push(clone(defaultState.trios[x.trios.length]));
+  x.capitalItems=Array.isArray(x.capitalItems)?x.capitalItems:[];
+  x.production=Array.isArray(x.production)?x.production:[];
+  x.sales=Array.isArray(x.sales)?x.sales:[];
+  x.production=x.production.map(p=>({id:p.id||uid(),trioId:p.trioId||x.trios[0].id,date:p.date||today(),eggs:Number(p.eggs)||0,infertile:Number(p.infertile)||0,unhatched:Number(p.unhatched)||0,hatched:Number(p.hatched)||0,dead:Number(p.dead??p.died)||0,unsaleable:Number(p.unsaleable)||0,retained:Number(p.retained)||0,saleable:Number(p.saleable)||0,notes:p.notes||""}));
+  x.sales=x.sales.map(s=>({id:s.id||uid(),trioId:s.trioId||x.trios[0].id,date:s.date||today(),qty:Number(s.qty)||0,price:Number(s.price)||x.settings.salePrice,buyer:s.buyer||""}));
+  return x;
+}
+function loadLocal(){try{let raw=localStorage.getItem(KEY);if(!raw)raw=localStorage.getItem("gamefowl_finance_v2");return normalize(raw?JSON.parse(raw):null)}catch(e){return clone(defaultState)}}
+let S=loadLocal();
+function saveLocal(){localStorage.setItem(KEY,JSON.stringify(S));localStorage.setItem(KEY+"_saved_at",new Date().toISOString())}
+function peso(n){return "₱"+Number(n||0).toLocaleString("en-PH",{minimumFractionDigits:2,maximumFractionDigits:2})}
+function num(v,min=0){let n=Number(v);return Number.isFinite(n)?Math.max(min,n):0}
+function escAttr(v){return String(v??"").replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+function esc(x){return String(x??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[m]))}
+function pct(n){return Number.isFinite(n)?n.toFixed(1)+"%":"0.0%"}
+function getTrio(id){return S.trios.find(t=>t.id===id)||S.trios[0]}
+function productionTotals(trioId){let a={eggs:0,infertile:0,unhatched:0,hatched:0,dead:0,unsaleable:0,retained:0,saleable:0};S.production.filter(x=>x.trioId===trioId).forEach(x=>Object.keys(a).forEach(k=>a[k]+=Number(x[k])||0));return a}
+function soldQty(trioId){return S.sales.filter(x=>x.trioId===trioId).reduce((a,x)=>a+Number(x.qty||0),0)}
+function revenue(trioId){return S.sales.filter(x=>!trioId||x.trioId===trioId).reduce((a,x)=>{const q=num(x.qty),p=num(x.price);return a+q*p},0)}
+function capitalTotal(trioId){let base=S.trios.filter(t=>!trioId||t.id===trioId).reduce((a,t)=>a+Number(t.capital||0)+Number(t.housing||0),0);return base+S.capitalItems.filter(x=>!trioId||x.trioId===trioId).reduce((a,x)=>a+Number(x.amount||0),0)}
+function inventory(trioId){let p=productionTotals(trioId);return Math.max(0,p.saleable-soldQty(trioId))}
+function standardSalePrice(){return num(S.settings.salePrice)||1000}
+function unrealizedPotential(trioId){
+  return inventory(trioId)*standardSalePrice();
+}
+function potentialRevenue(trioId){
+  return revenue(trioId)+unrealizedPotential(trioId);
+}
+function cards(arr){return `<div class="grid">${arr.map(x=>`<div class="card stat"><div class="label">${x[0]}</div><div class="value">${x[1]}</div>${x[2]?`<div class="muted">${x[2]}</div>`:""}</div>`).join("")}</div>`}
+function distributionForSale(s){let ratio=(Number(s.price)||0)/(Number(S.settings.salePrice)||1000);return S.settings.partners.map(p=>({name:p.name,amount:Number(p.share||0)*ratio}))}
+function partnerIncome(index){let p=S.settings.partners[index];return S.sales.reduce((a,s)=>a+(Number(s.qty)||0)*Number(p.share||0)*((Number(s.price)||0)/(Number(S.settings.salePrice)||1000)),0)}
+function metrics(trioId){let p=productionTotals(trioId),sold=soldQty(trioId),rev=revenue(trioId),cap=capitalTotal(trioId);let hatch=p.eggs?100*p.hatched/p.eggs:0;let survival=p.hatched?100*(p.hatched-p.dead)/p.hatched:0;let recovery=cap?100*rev/cap:0;return {p,sold,rev,cap,hatch,survival,recovery,inv:Math.max(0,p.saleable-sold)}}
+
+function chartCanvas(id){
+  const c=document.getElementById(id);
+  if(!c)return null;
+  const dpr=window.devicePixelRatio||1, rect=c.getBoundingClientRect();
+  const w=Math.max(280,Math.round(rect.width)), h=Math.max(180,Math.round(rect.height));
+  c.width=w*dpr; c.height=h*dpr;
+  const ctx=c.getContext("2d"); ctx.setTransform(dpr,0,0,dpr,0,0);
+  return {c,ctx,w,h};
+}
+function chartText(ctx,text,x,y,size=12,align="left"){
+  ctx.fillStyle="#111827";ctx.font=`${size}px Arial`;ctx.textAlign=align;ctx.textBaseline="middle";ctx.fillText(text,x,y);
+}
+function drawBarChart(id,labels,values){
+  const z=chartCanvas(id); if(!z)return;
+  const {ctx,w,h}=z;
+  const max=Math.max(1,...values.map(v=>Number(v)||0));
+  const left=54,right=12,top=12,bottom=(labels.length>8?58:40);
+  const pw=w-left-right, ph=h-top-bottom, gap=pw/Math.max(1,labels.length);
+
+  ctx.strokeStyle="#d8dde5";ctx.lineWidth=1;
+  for(let i=0;i<=4;i++){
+    let y=top+ph-i*ph/4;
+    ctx.beginPath();ctx.moveTo(left,y);ctx.lineTo(w-right,y);ctx.stroke();
+    chartText(ctx,Math.round(max*i/4).toString(),left-8,y,10,"right");
+  }
+
+  const mobile=w<520;
+  const showEvery=Math.max(1,Math.ceil(labels.length/(mobile?5:12)));
+  const shortLabel=(label)=>{
+    if(!mobile)return label;
+    const m=String(label).match(/^([A-Za-z]{3})\s+(\d{4})$/);
+    return m ? m[1] : String(label);
+  };
+
+  values.forEach((v,i)=>{
+    const val=Math.max(0,Number(v)||0);
+    const bh=ph*val/max;
+    const bw=Math.min(38,Math.max(12,gap*.58));
+    const x=left+i*gap+(gap-bw)/2;
+    const y=top+ph-bh;
+
+    ctx.fillStyle="#3b82f6";
+    ctx.fillRect(x,y,bw,bh);
+
+    // Only show value labels for non-zero bars, avoiding a wall of zeros.
+    if(val>0){
+      chartText(ctx,Math.round(val).toString(),x+bw/2,Math.max(9,y-8),10,"center");
+    }
+
+    // Show fewer x-axis labels on small screens so months never overlap.
+    const shouldShow = !mobile || i%showEvery===0 || i===labels.length-1;
+    if(shouldShow){
+      ctx.save();
+      ctx.translate(x+bw/2,h-18);
+      ctx.rotate(mobile ? -Math.PI/6 : 0);
+      chartText(ctx,shortLabel(labels[i]),0,0,10,"center");
+      ctx.restore();
+    }
+  });
+}
+
+function drawDonutChart(id,labels,values){
+  const z=chartCanvas(id); if(!z)return; const {ctx,w,h}=z;
+  const total=values.reduce((a,v)=>a+Math.max(0,Number(v)||0),0);
+  const cx=w*.38,cy=h*.48,r=Math.min(w,h)*.30,inner=r*.58;
+  const fills=["#3b82f6","#f59e0b","#10b981","#8b5cf6","#ef4444"];
+  if(total<=0){ctx.strokeStyle="#e5e7eb";ctx.lineWidth=r-inner;ctx.beginPath();ctx.arc(cx,cy,r-(r-inner)/2,0,Math.PI*2);ctx.stroke();chartText(ctx,"No data",cx,cy,13,"center");return}
+  let a=-Math.PI/2;
+  values.forEach((v,i)=>{let n=Math.max(0,Number(v)||0), da=n/total*Math.PI*2;if(!da)return;ctx.strokeStyle=fills[i%fills.length];ctx.lineWidth=r-inner;ctx.beginPath();ctx.arc(cx,cy,r-(r-inner)/2,a,a+da);ctx.stroke();a+=da});
+  chartText(ctx,"Revenue",cx,cy-7,11,"center");chartText(ctx,peso(total),cx,cy+10,13,"center");
+  const lx=w*.68; labels.forEach((l,i)=>{const y=35+i*27;ctx.fillStyle=fills[i%fills.length];ctx.beginPath();ctx.arc(lx,y,5,0,Math.PI*2);ctx.fill();chartText(ctx,l,lx+10,y,11,"left");chartText(ctx,peso(values[i]),w-10,y,11,"right")});
+}
+function drawProductionChart(){
+  const by={}; S.production.forEach(p=>{const t=getTrio(p.trioId);if(!by[t.name])by[t.name]=0;by[t.name]+=Number(p.saleable)||0});
+  drawBarChart("productionChart",Object.keys(by),Object.values(by));
+}
+function drawSalesChart(){
+  const by={}; S.sales.forEach(s=>{const t=getTrio(s.trioId);if(!by[t.name])by[t.name]=0;by[t.name]+=Number(s.revenue??(Number(s.qty||0)*Number(s.price||0)))||0});
+  drawDonutChart("salesChart",Object.keys(by),Object.values(by));
+}
+function drawCapitalChart(){
+  const labels=S.trios.map(t=>t.name), vals=S.trios.map(t=>Number(t.capital||0)+Number(t.housing||0));
+  drawBarChart("capitalChart",labels,vals);
+}
+function drawPartnerChart(){
+  const labels=S.settings.partners.map(p=>p.name), vals=S.settings.partners.map((p,i)=>partnerIncome(i));
+  drawBarChart("partnerChart",labels,vals);
+}
+
+function recordDate(x){
+  return x?.date || x?.saleDate || x?.productionDate || "";
+}
+function monthKey(date){
+  if(!date)return "";
+  const raw=String(date);
+  const m=raw.match(/^(\d{4})-(\d{1,2})/);
+  if(m)return m[1]+"-"+String(Number(m[2])).padStart(2,"0");
+  const d=new Date(raw);
+  if(Number.isNaN(d.getTime()))return "";
+  return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0");
+}
+function monthLabel(key){
+  if(!key)return "Unknown";
+  const [y,m]=key.split("-");
+  return new Date(Number(y),Number(m)-1,1).toLocaleDateString(undefined,{month:"short",year:"numeric"});
+}
+function monthlyKeys(){
+  const keys=new Set();
+  S.sales.forEach(x=>{const k=monthKey(recordDate(x));if(k)keys.add(k)});
+  S.production.forEach(x=>{const k=monthKey(recordDate(x));if(k)keys.add(k)});
+  const now=new Date();
+  const current=now.getFullYear()+"-"+String(now.getMonth()+1).padStart(2,"0");
+  keys.add(current);
+
+  const arr=[...keys].sort();
+  // Keep a useful chart window, but always include every month containing
+  // recorded activity. This prevents an older November sale from disappearing.
+  if(arr.length<=12)return arr;
+  return arr.slice(-24);
+}
+function monthlyPartnerIncomeValues(months,index){
+  const p=S.settings.partners[index]||{};
+  const share=Number(p.share)||0;
+  const standard=Number(S.settings.salePrice)||1000;
+  return months.map(k=>S.sales.reduce((sum,x)=>{
+    if(monthKey(recordDate(x))!==k)return sum;
+    const qty=Number(x.qty)||0, price=Number(x.price)||0;
+    return sum + qty*share*(price/standard);
+  },0));
+}
+function drawMonthlyPartnerRevenueChart(){
+  const months=monthlyKeys();
+  const z=chartCanvas("monthlyPartnerRevenueChart"); if(!z)return;
+  const {ctx,w,h}=z;
+  const series=S.settings.partners.map((p,i)=>({name:p.name,values:monthlyPartnerIncomeValues(months,i)}));
+  const all=series.flatMap(x=>x.values), max=Math.max(1,...all);
+  const left=56,right=12,top=18,bottom=42,pw=w-left-right,ph=h-top-bottom;
+  ctx.clearRect(0,0,w,h);
+  ctx.strokeStyle="#d1d5db";ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(left,top);ctx.lineTo(left,h-bottom);ctx.lineTo(w-right,h-bottom);ctx.stroke();
+  const ticks=4;
+  for(let i=0;i<=ticks;i++){const y=top+ph-(ph*i/ticks),v=max*i/ticks;ctx.strokeStyle="#e5e7eb";ctx.beginPath();ctx.moveTo(left,y);ctx.lineTo(w-right,y);ctx.stroke();chartText(ctx,peso(v),left-7,y,10,"right");}
+  series.forEach((ser,si)=>{ctx.beginPath();ser.values.forEach((v,i)=>{const x=left+(months.length===1?pw/2:(pw*i/(months.length-1)));const y=top+ph-(v/max)*ph;i?ctx.lineTo(x,y):ctx.moveTo(x,y)});ctx.strokeStyle=si===0?"#2563eb":si===1?"#16a34a":"#dc2626";ctx.lineWidth=2;ctx.stroke();ser.values.forEach((v,i)=>{const x=left+(months.length===1?pw/2:(pw*i/(months.length-1))),y=top+ph-(v/max)*ph;ctx.fillStyle=ctx.strokeStyle;ctx.beginPath();ctx.arc(x,y,3,0,Math.PI*2);ctx.fill()});});
+  months.forEach((m,i)=>{const x=left+(months.length===1?pw/2:(pw*i/(months.length-1)));chartText(ctx,monthLabel(m),x,h-20,9,"center")});
+  series.forEach((ser,i)=>{const x=left+i*110;chartText(ctx,ser.name,x,10,10,"left")});
+}
+
+function monthlyRevenueValues(months){
+  return months.map(k=>S.sales.reduce((sum,s)=>{
+    if(monthKey(recordDate(s))!==k)return sum;
+    const rev=Number(s.revenue);
+    const calculated=(Number(s.qty)||0)*(Number(s.price)||0);
+    return sum+(Number.isFinite(rev)&&rev>0?rev:calculated);
+  },0));
+}
+function monthlyProductionValues(months){
+  return months.map(k=>S.production.reduce((sum,p)=>{
+    return monthKey(recordDate(p))===k ? sum+(Number(p.saleable)||0) : sum;
+  },0));
+}
+function monthlySalesQtyValues(months){
+  return months.map(k=>S.sales.reduce((sum,s)=>{
+    return monthKey(recordDate(s))===k ? sum+(Number(s.qty)||0) : sum;
+  },0));
+}
+function drawMonthlyRevenueChart(){
+  const months=monthlyKeys();
+  drawBarChart("monthlyRevenueChart",months.map(monthLabel),monthlyRevenueValues(months));
+}
+function drawMonthlyProductionChart(){
+  const months=monthlyKeys();
+  drawBarChart("monthlyProductionChart",months.map(monthLabel),monthlyProductionValues(months));
+}
+function drawMonthlySalesQtyChart(){
+  const months=monthlyKeys();
+  drawBarChart("monthlySalesQtyChart",months.map(monthLabel),monthlySalesQtyValues(months));
+}
+function renderMonthlyCharts(){
+  requestAnimationFrame(()=>{
+    drawMonthlyRevenueChart();
+    drawMonthlyProductionChart();
+    drawMonthlySalesQtyChart();
+    drawMonthlyPartnerRevenueChart();
+  });
+}
+function renderCharts(){
+  requestAnimationFrame(()=>{
+    drawProductionChart();
+    drawSalesChart();
+    drawCapitalChart();
+    drawPartnerChart();
+    drawMonthlyRevenueChart();
+    drawMonthlyProductionChart();
+    drawMonthlySalesQtyChart();
+    drawMonthlyPartnerRevenueChart();
+  });
+}
+window.addEventListener("resize",()=>{if(document.getElementById("dashboard")?.offsetParent!==null)renderCharts()});
+
+function renderDashboard(){
+ let all=metrics(), rev=revenue(),cap=capitalTotal(),charsonShare=partnerIncome(0),investorProfit=rev-cap-charsonShare,sold=S.sales.reduce((a,x)=>a+Number(x.qty||0),0),prod=S.production.reduce((a,x)=>a+Number(x.saleable||0),0),inv=Math.max(0,prod-sold),unrealized=unrealizedPotential(),potential=potentialRevenue();
+ document.getElementById("dashboard").innerHTML=`
+ <section class="card hero"><h2>Project Dashboard</h2><div class="muted">Last saved: ${esc((localStorage.getItem(KEY+"_saved_at")||"Not yet saved").replace("T"," ").replace("Z",""))}<br>A clear view of your two trios, production, sales, capital, partner returns and remaining revenue potential.</div>${cards([["Total Capital",peso(cap)], ["Total Revenue",peso(rev)], ["Potential Revenue",peso(potential),"Actual revenue plus the value of all currently saleable but unsold birds"], ["Unrealized Potential",peso(unrealized),"Revenue still available if all current saleable inventory is sold at the standard price"], ["Profit for Investors (Mark + Rik2)",peso(investorProfit),"After capital recovery and excluding Charson's ₱500 management share"], ["Charson Management Share",peso(charsonShare),"Not included in investor profit"], ["Birds Sold",sold], ["Saleable Production",prod], ["Current Saleable Inventory",inv]])}</section>
+ <section><h2>Trio Performance</h2><div class="grid">${S.trios.map(t=>{let m=metrics(t.id);return `<div class="card trio"><div class="trio-head"><h3>${esc(t.name)}</h3><span class="pill">${m.recovery.toFixed(0)}% capital recovery</span></div>${cards([["Capital",peso(m.cap)],["Revenue",peso(m.rev)],["Potential Revenue",peso(potentialRevenue(t.id))],["Unrealized Potential",peso(unrealizedPotential(t.id))],["Sold",m.sold],["Inventory",m.inv],["Hatch Rate",pct(m.hatch)],["Survival",pct(m.survival)]])}<div class="progress"><span style="width:${Math.min(100,Math.max(0,m.recovery))}%"></span></div><div class="muted" style="margin-top:6px">Revenue vs capital invested</div></div>`}).join("")}</div></section>
+ <section><h2>Partner Distribution</h2>${cards(S.settings.partners.map((p,i)=>[p.name,peso(partnerIncome(i)),i===0?"Management share — excluded from investor profit":"Investor distribution"]))}</section>
+ <section><h2>Visual Summary</h2>
+   <div class="chart-grid">
+     <div class="chart-card"><h3>Saleable Production by Trio</h3><div class="chart-wrap"><canvas id="productionChart"></canvas></div></div>
+     <div class="chart-card"><h3>Revenue by Trio</h3><div class="chart-wrap"><canvas id="salesChart"></canvas></div></div>
+     <div class="chart-card"><h3>Capital by Trio</h3><div class="chart-wrap"><canvas id="capitalChart"></canvas></div></div>
+     <div class="chart-card"><h3>Partner Distribution</h3><div class="chart-wrap"><canvas id="partnerChart"></canvas></div></div>
+   </div>
+ </section>
+ <section><h2>Monthly Trends</h2>
+   <div class="muted">Monthly view of the last 12 months. Months with no activity show zero. On phones, month labels are spaced automatically for readability.</div>
+   <div class="chart-grid">
+     <div class="chart-card"><h3>Monthly Revenue</h3><div class="chart-wrap"><canvas id="monthlyRevenueChart"></canvas></div></div>
+     <div class="chart-card"><h3>Monthly Saleable Production</h3><div class="chart-wrap"><canvas id="monthlyProductionChart"></canvas></div></div>
+     <div class="chart-card"><h3>Monthly Birds Sold</h3><div class="chart-wrap"><canvas id="monthlySalesQtyChart"></canvas></div></div>
+      <div class="chart-card"><h3>Revenue per Partner per Month</h3><div class="chart-wrap"><canvas id="monthlyPartnerRevenueChart"></canvas></div></div>
+   </div>
+   <div class="card" style="margin-top:12px">
+     <h3>Monthly Sales Summary</h3>
+     <div class="muted">Every month with recorded sales is listed here, including November.</div>
+     <div style="overflow:auto">
+       <table class="data-table">
+         <thead><tr><th>Month</th><th>Birds Sold</th><th>Revenue</th></tr></thead>
+         <tbody>${monthlyKeys().filter(k=>monthlyRevenueValues([k])[0]>0 || monthlySalesQtyValues([k])[0]>0).reverse().map(k=>{
+           const qty=monthlySalesQtyValues([k])[0], rev=monthlyRevenueValues([k])[0];
+           return `<tr><td>${esc(monthLabel(k))}</td><td>${qty}</td><td>${peso(rev)}</td></tr>`;
+         }).join("") || '<tr><td colspan="3" class="muted">No sales recorded yet.</td></tr>'}</tbody>
+       </table>
+     </div>
+   </div>
+ </section>
+ <section class="notice"><b>Accounting rule:</b> Charson's share is treated as a management share because Charson did not invest capital. It is <b>excluded from investor profit</b>. <b>Potential Revenue</b> = recorded revenue + current saleable inventory × standard sale price. <b>Unrealized Potential</b> is the value of those unsold saleable birds and is not counted as actual revenue until sold.</section>`;
+ renderCharts();
+}
+function renderTrios(){
+ document.getElementById("trios").innerHTML=`<section><h2>Your 2 Trios</h2><div class="grid">${S.trios.map(t=>{let m=metrics(t.id);return `<div class="card trio"><div class="trio-head"><h3>${esc(t.name)}</h3><span class="pill">${m.inv} available</span></div><p class="muted">${esc(t.notes||"Separate accounting for this trio.")}</p>${cards([["Purchase Capital",peso(t.capital)],["Housing / Cages",peso(t.housing)],["Additional Capital",peso(capitalTotal(t.id)-Number(t.capital||0)-Number(t.housing||0))],["Total Capital",peso(m.cap)],["Revenue",peso(m.rev)],["Return After Capital",peso(m.rev-m.cap)]])}<div class="actions"><button class="btn" onclick="openTrioCapital('${t.id}')">Manage Capital</button><button class="btn secondary" onclick="goProduction('${t.id}')">View Production</button><button class="btn secondary" onclick="goSales('${t.id}')">View Sales</button></div></div>`}).join("")}</div></section>`;
+}
+function goProduction(id){tab("production",document.querySelectorAll("nav button")[2]);setTimeout(()=>{let e=document.getElementById("prTrio");if(e)e.value=id},0)}
+function goSales(id){tab("sales",document.querySelectorAll("nav button")[3]);setTimeout(()=>{let e=document.getElementById("saTrio");if(e)e.value=id},0)}
+function openTrioCapital(id){tab("capital",document.querySelectorAll("nav button")[4]);setTimeout(()=>{let e=document.getElementById("caTrio");if(e)e.value=id},0)}
+
+function validateProduction(x){
+  const totalOut=Number(x.infertile||0)+Number(x.unhatched||0)+Number(x.hatched||0);
+  if(Number(x.eggs||0)>0 && totalOut>Number(x.eggs||0)){
+    return "Infertile + Unhatched + Hatched cannot exceed Eggs.";
+  }
+  const expected=Math.max(0,Number(x.hatched||0)-Number(x.dead||0)-Number(x.unsaleable||0)-Number(x.retained||0));
+  if(Number(x.saleable||0)>expected){
+    return "Saleable cannot exceed Hatched minus Dead, Unsaleable and Retained.";
+  }
+  return "";
+}
+
+function renderProduction(){
+  const list=S.production.slice().reverse().map((x,ri)=>{
+    const id=x.id;
+    const trio=getTrio(x.trioId);
+    const eggs=Number(x.eggs)||0;
+    const infertile=Number(x.infertile)||0;
+    const unhatched=Number(x.unhatched)||0;
+    const hatched=Number(x.hatched)||0;
+    const dead=Number(x.dead??x.died)||0;
+    const unsaleable=Number(x.unsaleable)||0;
+    const retained=Number(x.retained)||0;
+    const saleable=Number(x.saleable)||Math.max(0,hatched-dead-unsaleable-retained);
+    const hatch=eggs?100*hatched/eggs:0;
+    const survival=hatched?100*(hatched-dead)/hatched:0;
+    return `<div class="item production-record" id="production-card-${escAttr(id)}">
+      <div class="item-title">${esc(trio.name)} <span class="pill">${esc(x.date||"")}</span></div>
+      <div class="production-stats">
+        <div><span>Eggs</span><b>${eggs}</b></div>
+        <div><span>Hatched</span><b>${hatched}</b></div>
+        <div><span>Saleable</span><b>${saleable}</b></div>
+        <div><span>Hatch Rate</span><b>${hatch.toFixed(1)}%</b></div>
+        <div><span>Survival</span><b>${survival.toFixed(1)}%</b></div>
+      </div>
+      <div class="production-details">
+        <div>Infertile: <b>${infertile}</b></div>
+        <div>Unhatched: <b>${unhatched}</b></div>
+        <div>Dead: <b>${dead}</b></div>
+        <div>Unsaleable: <b>${unsaleable}</b></div>
+        <div>Retained: <b>${retained}</b></div>
+      </div>
+      ${x.notes?`<div class="muted" style="margin-top:8px">${esc(x.notes)}</div>`:""}
+      <div class="item-actions">
+        <button class="btn" onclick="editProduction('${escAttr(id)}')">Edit</button>
+        <button class="btn danger" onclick="deleteProduction('${escAttr(id)}')">Delete</button>
+      </div>
+    </div>`;
+  }).join("");
+
+  document.getElementById("production").innerHTML=`
+  <section class="card">
+    <h2>Production</h2>
+    <div class="muted">Record eggs and chick outcomes for each trio. You can edit or delete any record if you entered something incorrectly.</div>
+    <div class="row" style="margin-top:10px">
+      <label>Trio<select id="prTrio">${S.trios.map(t=>`<option value="${t.id}">${esc(t.name)}</option>`).join("")}</select></label>
+      <label>Date<input id="prDate" type="date" value="${today()}"></label>
+      <label>Eggs<input id="eggs" type="number" min="0" step="1" value="0"></label>
+      <label>Infertile<input id="infertile" type="number" min="0" step="1" value="0"></label>
+      <label>Unhatched<input id="unhatched" type="number" min="0" step="1" value="0"></label>
+      <label>Hatched<input id="hatched" type="number" min="0" step="1" value="0"></label>
+      <label>Dead<input id="dead" type="number" min="0" step="1" value="0"></label>
+      <label>Unsaleable<input id="unsaleable" type="number" min="0" step="1" value="0"></label>
+      <label>Retained<input id="retained" type="number" min="0" step="1" value="0"></label>
+      <label>Saleable<input id="saleable" type="number" min="0" step="1" value="0"></label>
+      <label class="full">Notes<input id="prNotes" placeholder="Optional notes"></label>
+    </div>
+    <div class="actions">
+      <button type="button" class="btn success" onclick="addProduction()">Record Production</button>
+      <button type="button" class="btn secondary" onclick="clearProductionForm()">Clear</button>
+    </div>
+  </section>
+  <section>
+    <h2>Production History</h2>
+    <div class="list">${list||`<div class="empty">No production recorded yet.</div>`}</div>
+  </section>`;
+}
+
+function clearProductionForm(){
+  const ids=["eggs","infertile","unhatched","hatched","dead","unsaleable","retained","saleable"];
+  ids.forEach(id=>{const el=document.getElementById(id);if(el)el.value=0;});
+  const d=document.getElementById("prDate");if(d)d.value=today();
+  const n=document.getElementById("prNotes");if(n)n.value="";
+}
+
+function addProduction(){
+  const num=id=>Math.max(0,Number(document.getElementById(id)?.value)||0);
+  const x={
+    id:uid(),
+    trioId:document.getElementById("prTrio")?.value||S.trios[0]?.id,
+    date:document.getElementById("prDate")?.value||today(),
+    eggs:num("eggs"),
+    infertile:num("infertile"),
+    unhatched:num("unhatched"),
+    hatched:num("hatched"),
+    dead:num("dead"),
+    unsaleable:num("unsaleable"),
+    retained:num("retained"),
+    saleable:num("saleable"),
+    notes:document.getElementById("prNotes")?.value.trim()||""
+  };
+
+  if(!x.trioId){alert("Please select a trio.");return;}
+  if(!x.eggs&&!x.infertile&&!x.unhatched&&!x.hatched&&!x.dead&&!x.unsaleable&&!x.retained&&!x.saleable){
+    alert("Please enter at least one production quantity.");
+    return;
+  }
+
+  // If saleable is left at zero, calculate the expected saleable chicks.
+  if(x.saleable===0){
+    x.saleable=Math.max(0,x.hatched-x.dead-x.unsaleable-x.retained);
+  }
+
+  const problem=validateProduction(x);
+  if(problem){alert(problem);return;}
+
+  S.production.push(x);
+  save();
+  clearProductionForm();
+  alert("Production recorded successfully.");
+}
+
+function editProduction(id){
+  const x=S.production.find(p=>p.id===id);
+  if(!x)return;
+  const card=document.getElementById("production-card-"+id);
+  if(!card)return;
+  const dead=Number(x.dead??x.died)||0;
+  card.innerHTML=`<div class="item-title">Edit Production</div>
+  <div class="row">
+    <label>Trio<select id="epTrio_${id}">${S.trios.map(t=>`<option value="${t.id}" ${t.id===x.trioId?"selected":""}>${esc(t.name)}</option>`).join("")}</select></label>
+    <label>Date<input id="epDate_${id}" type="date" value="${escAttr(x.date||"")}"></label>
+    <label>Eggs<input id="ep_eggs_${id}" type="number" min="0" value="${Number(x.eggs)||0}"></label>
+    <label>Infertile<input id="ep_infertile_${id}" type="number" min="0" value="${Number(x.infertile)||0}"></label>
+    <label>Unhatched<input id="ep_unhatched_${id}" type="number" min="0" value="${Number(x.unhatched)||0}"></label>
+    <label>Hatched<input id="ep_hatched_${id}" type="number" min="0" value="${Number(x.hatched)||0}"></label>
+    <label>Dead<input id="ep_dead_${id}" type="number" min="0" value="${dead}"></label>
+    <label>Unsaleable<input id="ep_unsaleable_${id}" type="number" min="0" value="${Number(x.unsaleable)||0}"></label>
+    <label>Retained<input id="ep_retained_${id}" type="number" min="0" value="${Number(x.retained)||0}"></label>
+    <label>Saleable<input id="ep_saleable_${id}" type="number" min="0" value="${Number(x.saleable)||0}"></label>
+    <label class="full">Notes<input id="ep_notes_${id}" value="${escAttr(x.notes||"")}" placeholder="Optional notes"></label>
+  </div>
+  <div class="item-actions">
+    <button class="btn" onclick="saveProductionEdit('${id}')">Save Changes</button>
+    <button class="btn secondary" onclick="renderProduction()">Cancel</button>
+  </div>`;
+}
+
+function saveProductionEdit(id){
+  const x=S.production.find(p=>p.id===id);
+  if(!x)return;
+  const val=s=>Math.max(0,Number(document.getElementById(s).value)||0);
+  x.trioId=document.getElementById("epTrio_"+id).value;
+  x.date=document.getElementById("epDate_"+id).value||today();
+  x.eggs=val("ep_eggs_"+id);
+  x.infertile=val("ep_infertile_"+id);
+  x.unhatched=val("ep_unhatched_"+id);
+  x.hatched=val("ep_hatched_"+id);
+  x.dead=val("ep_dead_"+id);
+  x.unsaleable=val("ep_unsaleable_"+id);
+  x.retained=val("ep_retained_"+id);
+  x.saleable=val("ep_saleable_"+id);
+  x.notes=document.getElementById("ep_notes_"+id)?.value.trim()||"";
+  const problem=validateProduction(x);
+  if(problem){alert(problem);return;}
+  save();
+}
+
+function deleteProduction(id){
+  if(!confirm("Delete this production record?"))return;
+  S.production=S.production.filter(p=>p.id!==id);
+  save();
+}
+
+function renderSales(){
+ let list=S.sales.slice().reverse().map((x,ri)=>{let i=S.sales.length-1-ri;return `<div class="item"><div class="item-title">${esc(getTrio(x.trioId).name)} <span class="pill">${x.date}</span></div><div class="item-grid"><label>Date<input id="sedate${i}" type="date" value="${x.date}"></label><label>Trio<select id="setrio${i}">${S.trios.map(t=>`<option value="${t.id}" ${t.id===x.trioId?"selected":""}>${esc(t.name)}</option>`).join("")}</select></label><label>Quantity<input id="seqty${i}" type="number" min="1" value="${x.qty}"></label><label>Price / bird<input id="seprice${i}" type="number" min="0" value="${x.price}"></label><label style="grid-column:1/-1">Buyer / reference<input id="sebuyer${i}" value="${esc(x.buyer||"")}"></label></div><div style="margin-top:9px"><span class="label">Revenue</span><div class="value">${peso(x.qty*x.price)}</div></div><div class="item-actions"><button class="btn" onclick="updateSale(${i})">Save Changes</button><button class="btn danger" onclick="deleteSale(${i})">Delete</button></div></div>`}).join("");
+ document.getElementById("sales").innerHTML=`<section class="card"><h2>Sales</h2><div class="muted">Sales are fully editable. Each sale automatically updates revenue, partner distribution and inventory.</div><div class="row" style="margin-top:10px"><label>Trio<select id="saTrio">${S.trios.map(t=>`<option value="${t.id}">${esc(t.name)}</option>`).join("")}</select></label><label>Date<input id="saDate" type="date" value="${today()}"></label><label>Quantity<input id="saQty" type="number" min="1" value="1"></label><label>Price / bird<input id="saPrice" type="number" min="0" value="${S.settings.salePrice}"></label><label class="full">Buyer / reference<input id="saBuyer" placeholder="Optional"></label></div><div class="actions"><button class="btn success" onclick="addSale()">Record Sale</button><button class="btn secondary" onclick="resetSaleForm()">Clear</button></div></section><section><h2>Sales History</h2><div class="list">${list||`<div class="empty">No sales recorded yet.</div>`}</div></section>`;
+}
+function resetSaleForm(){document.getElementById("saDate").value=today();document.getElementById("saQty").value=1;document.getElementById("saPrice").value=S.settings.salePrice;document.getElementById("saBuyer").value=""}
+function addSale(){let q=Number(document.getElementById("saQty").value)||0,p=Number(document.getElementById("saPrice").value)||0;if(q<=0){alert("Enter a quantity.");return}S.sales.push({id:uid(),trioId:document.getElementById("saTrio").value,date:document.getElementById("saDate").value||today(),qty:q,price:p,buyer:document.getElementById("saBuyer").value.trim()});save()}
+function updateSale(i){let q=Number(document.getElementById("seqty"+i).value)||0,p=Number(document.getElementById("seprice"+i).value)||0;if(q<=0){alert("Enter a quantity.");return}Object.assign(S.sales[i],{date:document.getElementById("sedate"+i).value||today(),trioId:document.getElementById("setrio"+i).value,qty:q,price:p,buyer:document.getElementById("sebuyer"+i).value.trim()});save();alert("Sale updated.")}
+function deleteSale(i){if(confirm("Delete this sale record? Revenue, partner income and inventory will update.")){S.sales.splice(i,1);save()}}
+function renderCapital(){
+ let items=S.capitalItems.slice().reverse().map((x,ri)=>{let i=S.capitalItems.length-1-ri;return `<div class="item"><div class="item-title">${esc(x.description||x.category)} <span class="pill">${esc(x.category||"Capital")}</span></div><div class="item-grid"><div><div class="label">Trio</div><b>${esc(getTrio(x.trioId).name)}</b></div><div><div class="label">Date</div><b>${x.date}</b></div><div><div class="label">Amount</div><b>${peso(x.amount)}</b></div></div><div class="item-actions"><button class="btn" onclick="editCapital(${i})">Edit</button><button class="btn danger" onclick="deleteCapital(${i})">Delete</button></div></div>`}).join("");
+ document.getElementById("capital").innerHTML=`<section class="card"><h2>Capital</h2><div class="muted">Only capital is tracked here. Trio purchase, housing/cage and additional capital are recorded separately.</div><div class="grid" style="margin-top:10px">${S.trios.map(t=>`<div class="card trio"><h3>${esc(t.name)}</h3><div class="row"><label>Purchase Capital<input id="tc_${t.id}" type="number" min="0" value="${t.capital}"></label><label>Housing / Cages<input id="th_${t.id}" type="number" min="0" value="${t.housing}"></label></div><button class="btn" style="margin-top:9px;width:100%" onclick="saveBaseCapital('${t.id}')">Save Base Capital</button><div class="muted" style="margin-top:7px">Total base: ${peso(Number(t.capital)+Number(t.housing))}</div></div>`).join("")}</div></section><section class="card"><h2>Add Additional Capital</h2><div class="row"><label>Trio<select id="caTrio">${S.trios.map(t=>`<option value="${t.id}">${esc(t.name)}</option>`).join("")}</select></label><label>Date<input id="caDate" type="date" value="${today()}"></label><label>Category<select id="caCat"><option>Additional Capital</option><option>Cages / Housing</option><option>Equipment</option><option>Breeding Stock</option><option>Other Capital</option></select></label><label>Amount<input id="caAmt" type="number" min="0" step="0.01"></label><label class="full">Description<input id="caDesc" placeholder="e.g. additional cage materials"></label></div><button class="btn success" style="margin-top:10px;width:100%" onclick="addCapital()">Add Capital</button></section><section><h2>Additional Capital History</h2><div class="list">${items||`<div class="empty">No additional capital recorded.</div>`}</div></section>`;
+}
+function saveBaseCapital(id){let t=getTrio(id);t.capital=Math.max(0,Number(document.getElementById("tc_"+id).value)||0);t.housing=Math.max(0,Number(document.getElementById("th_"+id).value)||0);save();alert(t.name+" capital updated.")}
+function addCapital(){let a=Number(document.getElementById("caAmt").value)||0;if(a<=0){alert("Enter a capital amount.");return}S.capitalItems.push({id:uid(),trioId:document.getElementById("caTrio").value,date:document.getElementById("caDate").value||today(),category:document.getElementById("caCat").value,description:document.getElementById("caDesc").value.trim()||document.getElementById("caCat").value,amount:a});save()}
+function editCapital(i){let x=S.capitalItems[i];let html=`<div class="row"><label>Trio<select id="ecTrio">${S.trios.map(t=>`<option value="${t.id}" ${t.id===x.trioId?"selected":""}>${esc(t.name)}</option>`).join("")}</select></label><label>Date<input id="ecDate" type="date" value="${x.date}"></label><label>Category<select id="ecCat">${["Additional Capital","Cages / Housing","Equipment","Breeding Stock","Other Capital"].map(c=>`<option ${c===x.category?"selected":""}>${c}</option>`).join("")}</select></label><label>Amount<input id="ecAmt" type="number" min="0" value="${x.amount}"></label><label class="full">Description<input id="ecDesc" value="${esc(x.description||"")}"></label></div>`;showModal("Edit Capital",html,()=>{x.trioId=document.getElementById("ecTrio").value;x.date=document.getElementById("ecDate").value;x.category=document.getElementById("ecCat").value;x.amount=Math.max(0,Number(document.getElementById("ecAmt").value)||0);x.description=document.getElementById("ecDesc").value.trim()||x.category;save();closeModal()})}
+function deleteCapital(i){if(confirm("Delete this capital record?")){S.capitalItems.splice(i,1);save()}}
+function renderPartners(){
+ document.getElementById("partners").innerHTML=`<section class="card"><h2>Partners</h2><div class="muted">Partner names and shares are fixed as requested. Only the default sale price can be changed.</div><div class="row" style="margin-top:10px"><label>Default sale price<input id="defPrice" type="number" min="0" value="${S.settings.salePrice}"></label>${S.settings.partners.map(p=>`<label>${esc(p.name)} share<input type="number" value="${p.share}" readonly></label>`).join("")}</div><button class="btn" style="margin-top:10px;width:100%" onclick="savePartners()">Save Default Sale Price</button></section><section><h2>Current Distribution</h2>${cards(S.settings.partners.map((p,i)=>[p.name,peso(p.share),i===0?"50% of a ₱1,000 sale":i===1?"25% of a ₱1,000 sale":"25% of a ₱1,000 sale"]))}</section><section><h2>Total Income From Recorded Sales</h2>${cards(S.settings.partners.map((p,i)=>[p.name,peso(partnerIncome(i)),"Based on all recorded sales"]))}</section>`;
+}
+function savePartners(){let v=Math.max(0,Number(document.getElementById("defPrice").value)||0);S.settings.salePrice=v||1000;S.settings.partners=[{id:"p1",name:"Charson",share:500},{id:"p2",name:"Mark",share:250},{id:"p3",name:"Rik2",share:250}];save();alert("Partner settings saved.")}
+async function save(){saveLocal();render();}
+function renderData(){
+  document.getElementById("data").innerHTML=`
+  <section class="card">
+    <h2>Access</h2>
+    <div class="sync-ok">
+      <b>Signed in as ${esc((typeof loginUser!=="undefined"&&loginUser?.username)||"")}</b><br>
+      <span class="small">${(typeof loginRole!=="undefined"&&loginRole==="admin")?"Administrator access":"User access"} • Data is saved automatically on this device.</span>
+    </div>
+  </section>
+  <section class="card">
+    <h2>Backup & Restore</h2>
+    <p class="muted">Export a JSON backup regularly. Importing a backup replaces the current tracker data on this device.</p>
+    <div class="actions">
+      <button class="btn" onclick="downloadBackup()">Export Backup</button>
+      <label class="btn secondary" style="display:block;text-align:center;cursor:pointer">Import Backup<input type="file" accept=".json,application/json" style="display:none" onchange="importBackup(event)"></label>
+      <button class="btn danger" onclick="resetData()">Reset Tracker</button>
+    </div>
+  </section>
+  <section class="notice">
+    <b>Important:</b> This version uses device-local storage. Use <b>Export Backup</b> before changing phones or browsers.
+    The login is a simple app access gate, not enterprise-grade security. Data is stored in this browser on this device; export a backup before changing devices.
+  </section>`;
+}
+async function syncNow(){saveLocal();render();alert("Saved on this device.");}
+function downloadBackup(){let blob=new Blob([JSON.stringify(S,null,2)],{type:"application/json"}),a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="gamefowl-finance-backup.json";a.click();setTimeout(()=>URL.revokeObjectURL(a.href),500)}
+function importBackup(e){let f=e.target.files?.[0];if(!f)return;let r=new FileReader();r.onload=async()=>{try{S=normalize(JSON.parse(r.result));await save();alert("Backup restored.")}catch(err){alert("Invalid backup file.")}};r.readAsText(f)}
+async function resetData(){if(!confirm("Reset the entire tracker to the two default trios? This removes production, sales and additional capital records."))return;S=clone(defaultState);await save();alert("Tracker reset.")}
+function showModal(title,body,onSave){let old=document.getElementById("modal");if(old)old.remove();let d=document.createElement("div");d.id="modal";d.style.cssText="position:fixed;inset:0;background:#0008;z-index:100;display:flex;align-items:flex-end;justify-content:center;padding:10px";d.innerHTML=`<div style="background:#fff;width:min(720px,100%);max-height:90vh;overflow:auto;border-radius:18px;padding:15px"><h2 style="margin-top:0">${esc(title)}</h2><div>${body}</div><div class="actions"><button class="btn" id="modalSave">Save Changes</button><button class="btn secondary" onclick="closeModal()">Cancel</button></div></div>`;document.body.appendChild(d);document.getElementById("modalSave").onclick=onSave}
+function closeModal(){document.getElementById("modal")?.remove()}
+const tabs=[["dashboard","Dashboard"],["trios","2 Trios"],["production","Production"],["sales","Sales"],["capital","Capital"],["partners","Partners"],["data","Backup"]];
+document.getElementById("nav").innerHTML=tabs.map((x,i)=>`<button class="${i===0?"active":""}" onclick="tab('${x[0]}',this)">${x[1]}</button>`).join("");
+function tab(id,b){document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));document.getElementById(id).classList.add("active");document.querySelectorAll("nav button").forEach(x=>x.classList.remove("active"));b.classList.add("active");render()}
+function render(){renderDashboard();renderTrios();renderProduction();renderSales();renderCapital();renderPartners();renderData()}
+function init(){render();}
+init();
+</script>
+
+<script>
+/* ===== Local app access =====
+   This is a convenience access gate for this private tracker.
+   It is NOT a substitute for server-side authentication.
+*/
+let loginUser=null;
+let loginRole="viewer";
+
+const LOCAL_ACCOUNTS={
+  marklamosao:{hash:"f6df6082251d53a49227e732351f814b6d3219f5152526e0c3b525bd9ac5763c",role:"admin"},
+  ctlgamefowl:{hash:"00eb0685fcf978aad5c7277b74529b3539bdc34650b08572ee7f718f48e8a5bc",role:"user"}
+};
+
+async function hashPassword(value){
+  const data=new TextEncoder().encode(String(value||""));
+  const hash=await crypto.subtle.digest("SHA-256",data);
+  return Array.from(new Uint8Array(hash)).map(b=>b.toString(16).padStart(2,"0")).join("");
+}
+function setAuthMessage(msg){const el=document.getElementById("authError");if(el)el.textContent=msg||"";}
+function showAuth(show){const el=document.getElementById("authOverlay");if(el)el.style.display=show?"flex":"none";}
+function setRoleUI(){
+  const name=document.getElementById("userEmail"),role=document.getElementById("userRole");
+  if(name)name.textContent=loginUser?.username||"";
+  if(role){role.textContent=(loginRole||"user").toUpperCase();role.style.display=loginUser?"inline-block":"none";}
+  applyPermissions();
+  if(typeof renderData==="function" && loginUser)renderData();
+}
+function applyPermissions(){
+  document.querySelectorAll(".admin-only").forEach(el=>el.style.display=loginRole==="admin"?"":"none");
+  document.querySelectorAll("[data-role]").forEach(el=>{
+    const needed=(el.dataset.role||"user").split(",").map(x=>x.trim());
+    el.style.display=needed.includes(loginRole)?"":"none";
+  });
+}
+function localSignOut(){
+  try{sessionStorage.removeItem("gf_auth");}catch(e){}
+  loginUser=null;loginRole="viewer";showAuth(true);setAuthMessage("");
+}
+async function localLogin(username,password){
+  username=String(username||"").trim().toLowerCase();
+  const account=LOCAL_ACCOUNTS[username];
+  if(!account){setAuthMessage("Incorrect username or password.");return false;}
+  const hash=await hashPassword(password);
+  if(hash!==account.hash){setAuthMessage("Incorrect username or password.");return false;}
+  loginUser={username};
+  loginRole=account.role;
+  try{sessionStorage.setItem("gf_auth",JSON.stringify({username,role:account.role}));}catch(e){}
+  setAuthMessage("");
+  showAuth(false);
+  setRoleUI();
+  render();
+  return true;
+}
+function startLocalLogin(){
+  const input=document.getElementById("loginEmail");
+  if(input){input.type="text";input.placeholder="Username";input.setAttribute("inputmode","text");input.autocomplete="username";}
+  let saved=null;
+  try{saved=JSON.parse(sessionStorage.getItem("gf_auth")||"null");}catch(e){}
+  if(saved?.username && LOCAL_ACCOUNTS[saved.username]){
+    loginUser={username:saved.username};
+    loginRole=LOCAL_ACCOUNTS[saved.username].role;
+    showAuth(false);setRoleUI();render();
+  }else showAuth(true);
+}
+document.getElementById("loginPassword")?.addEventListener("keydown",e=>{
+  if(e.key==="Enter")localLogin(document.getElementById("loginEmail").value,document.getElementById("loginPassword").value);
+});
+startLocalLogin();
+</script>
+
+
+<script>
+if("serviceWorker" in navigator){window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}));}
+</script>
+</body>
+
+<!--
+LOGIN CONFIGURATION
+This version uses client-side credentials because no Supabase project credentials
+were supplied. This is suitable for basic/private use but is NOT strong security:
+anyone with access to the HTML source can inspect the credentials.
+For production-grade security, replace this with Supabase Auth + Row Level Security.
+-->
+
+</html>
